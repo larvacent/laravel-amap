@@ -1,0 +1,34 @@
+{
+    "name": "larva/laravel-amap",
+    "description": "This is a Laravel expansion for the AMAP.",
+    "keywords": [
+        "Larva",
+        "laravel",
+        "amap"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "illuminate/support": "^5.0",
+        "larva/supports": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Larva\\AMAP\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Larva\\AMAP\\AMAPServiceProvider"
+            ],
+            "aliases": {
+                "Aliyun": "Larva\\AMAP\\AMAP"
+            }
+        }
+    },
+    "prefer-stable": true
+}
