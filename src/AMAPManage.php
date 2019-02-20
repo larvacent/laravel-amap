@@ -8,7 +8,7 @@
 namespace Larva\AMAP;
 
 use GuzzleHttp\HandlerStack;
-use Larva\Supports\LBS;
+use Larva\Supports\LBSHelper;
 use Larva\Supports\Traits\HasHttpRequest;
 
 /**
@@ -71,7 +71,7 @@ class AMAPManage
     {
         $response = $this->get('/v3/ip', ['ip' => $ip]);
         if (is_array($response) && $response['status'] == 1 && $response['rectangle']) {
-            $location = LBS::getCenterFromDegrees(LBS::getAMAPRectangle($response['rectangle']));
+            $location = LBSHelper::getCenterFromDegrees(LBSHelper::getAMAPRectangle($response['rectangle']));
             return [
                 'province' => $response['province'],
                 'city' => $response['city'],
