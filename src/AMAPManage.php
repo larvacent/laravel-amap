@@ -65,20 +65,22 @@ class AMAPManage
     /**
      * IP定位
      * @param string $ip
-     * @return array|false
+     * @return array|false 返回的经纬度是 WGS84
      */
     public function ip($ip)
     {
         $response = $this->get('/v3/ip', ['ip' => $ip]);
         if (is_array($response) && $response['status'] == 1 && $response['rectangle']) {
             $location = LBSHelper::getCenterFromDegrees(LBSHelper::getAMAPRectangle($response['rectangle']));
+
+            list($longitude, $latitude) = LBSHelper::GCJ02ToWGS84($location[0], $location[1]);
             return [
                 'province' => $response['province'],
                 'city' => $response['city'],
                 'adcode' => $response['adcode'],
                 'rectangle' => $response['rectangle'],
-                'lon' => $location[0],
-                'lat' => $location[1]
+                'lon' => $longitude,
+                'lat' => $latitude
             ];
         }
         return false;
@@ -86,14 +88,16 @@ class AMAPManage
 
     /**
      * 逆地理位置编码
-     * @param float $lat 维度
-     * @param float $lon 精度
+     * @param float $longitude
+     * @param float $latitude
      * @param string $extensions
      * @return array|false
      */
-    public function regeo($lat, $lon, $extensions = 'base')
+    public function regeo($longitude, $latitude, $extensions = 'base')
     {
-        $response = $this->get('/v3/geocode/regeo', ['location' => $lon . ',' . $lat, 'extensions' => $extensions]);
+        //WGS84 -> gcj02
+        list($longitude, $latitude) = LBSHelper::WGS84ToGCJ02($longitude, $latitude);
+        $response = $this->get('/v3/geocode/regeo', ['location' => $longitude . ',' . $latitude, 'extensions' => $extensions]);
         if (is_array($response) && $response['status'] == 1 && is_array($response['regeocode']['addressComponent'])) {
             if ($response['regeocode']['addressComponent']) {
                 return $response['regeocode']['addressComponent'];
