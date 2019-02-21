@@ -9,3 +9,7 @@
 ```bash
 composer require larva/laravel-amap
 ```
+
+## 备注
+
+输入 输出 均为 WGS84 
