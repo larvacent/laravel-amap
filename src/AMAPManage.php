@@ -71,23 +71,22 @@ class AMAPManage
     {
         $response = $this->get('/v3/ip', ['ip' => $ip]);
         if (is_array($response) && $response['status'] == 1 && $response['rectangle']) {
-            $location = LBSHelper::getCenterFromDegrees(LBSHelper::getAMAPRectangle($response['rectangle']));
-
-            list($longitude, $latitude) = LBSHelper::GCJ02ToWGS84($location[0], $location[1]);
+            $rectangle = array_map([LBSHelper::class,'GCJ02ToWGS84'], LBSHelper::getAMAPRectangle($response['rectangle']));
+            $location = LBSHelper::getCenterFromDegrees($rectangle);
             return [
                 'province' => $response['province'],
                 'city' => $response['city'],
                 'adcode' => $response['adcode'],
-                'rectangle' => $response['rectangle'],
-                'lon' => $longitude,
-                'lat' => $latitude
+                'rectangle' => $response['rectangle'],//高德坐标系
+                'lon' => $location[0],
+                'lat' => $location[1]
             ];
         }
         return false;
     }
 
     /**
-     * 逆地理位置编码
+     * 逆地理位置编码 接收 WGS54坐标
      * @param float $longitude
      * @param float $latitude
      * @param string $extensions
