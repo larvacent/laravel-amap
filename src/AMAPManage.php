@@ -44,6 +44,22 @@ class AMAPManage
     }
 
     /**
+     * 坐标转换
+     * @param string $locations 经度和纬度用","分割，经度在前，纬度在后，经纬度小数点后不得超过6位。多个坐标对之间用”|”进行分隔最多支持40对坐标。
+     * @param string $coordSys 输入坐标系。可选值： gps、mapbar、baidu、autonavi(不进行转换)
+     * @return bool|array
+     */
+    public function coordinateConvert($locations, $coordSys)
+    {
+        $parameters = ['locations' => $locations, 'coordsys' => $coordSys];
+        $response = $this->get('/v3/assistant/coordinate/convert', $parameters);
+        if (is_array($response) && $response['status'] == 1 && $response['locations']) {
+            return array_shift($response['locations']);
+        }
+        return false;
+    }
+
+    /**
      * 地理编码
      * @param string $address 结构化地址信息
      * @param string $city 指定查询的城市
@@ -65,14 +81,13 @@ class AMAPManage
     /**
      * IP定位
      * @param string $ip
-     * @return array|false 返回的经纬度是 WGS84
+     * @return array|false 返回的经纬度是 GCJ02
      */
     public function ip($ip)
     {
         $response = $this->get('/v3/ip', ['ip' => $ip]);
         if (is_array($response) && $response['status'] == 1 && $response['rectangle']) {
-            $rectangle = array_map([LBSHelper::class,'GCJ02ToWGS84'], LBSHelper::getAMAPRectangle($response['rectangle']));
-            $location = LBSHelper::getCenterFromDegrees($rectangle);
+            $location = LBSHelper::getCenterFromDegrees(LBSHelper::getAMAPRectangle($response['rectangle']));
             return [
                 'province' => $response['province'],
                 'city' => $response['city'],
@@ -86,7 +101,7 @@ class AMAPManage
     }
 
     /**
-     * 逆地理位置编码 接收 WGS54坐标
+     * 逆地理位置编码 接收 GCJ02 坐标
      * @param float $longitude
      * @param float $latitude
      * @param string $extensions
@@ -94,8 +109,6 @@ class AMAPManage
      */
     public function regeo($longitude, $latitude, $extensions = 'base')
     {
-        //WGS84 -> gcj02
-        list($longitude, $latitude) = LBSHelper::WGS84ToGCJ02($longitude, $latitude);
         $response = $this->get('/v3/geocode/regeo', ['location' => $longitude . ',' . $latitude, 'extensions' => $extensions]);
         if (is_array($response) && $response['status'] == 1 && is_array($response['regeocode']['addressComponent'])) {
             if ($response['regeocode']['addressComponent']) {
