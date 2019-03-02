@@ -79,6 +79,23 @@ class AMAPManage
     }
 
     /**
+     * 行政区查询
+     * @param string $keywords 规则：只支持单个关键词语搜索关键词支持：行政区名称、citycode、adcode    例如，在subdistrict=2，搜索省份（例如山东），能够显示市（例如济南），区（例如历下区）
+     * @param int $subdistrict
+     * @param string $extensions
+     * @return bool|mixed
+     */
+    public function district($keywords, $subdistrict = 1, $extensions = 'base')
+    {
+        $parameters = ['keywords' => $keywords, 'subdistrict' => $subdistrict, 'extensions' => $extensions];
+        $response = $this->get('/v3/config/district', $parameters);
+        if (is_array($response) && $response['status'] == 1 && $response['districts']) {
+            return array_shift($response['districts']);
+        }
+        return false;
+    }
+
+    /**
      * IP定位
      * @param string $ip
      * @return array|false 返回的经纬度是 GCJ02
