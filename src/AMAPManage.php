@@ -87,10 +87,10 @@ class AMAPManage
      */
     public function district($keywords, $subdistrict = 1, $extensions = 'base')
     {
-        $parameters = ['keywords' => $keywords, 'subdistrict' => $subdistrict, 'extensions' => $extensions];
+        $parameters = ['keywords' => $keywords, 'subdistrict' => $subdistrict, 'extensions' => $extensions, 'offset' => 200];
         $response = $this->get('/v3/config/district', $parameters);
         if (is_array($response) && $response['status'] == 1 && $response['districts']) {
-            return array_shift($response['districts']);
+            return $response['districts'];
         }
         return false;
     }
