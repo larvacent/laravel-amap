@@ -9,7 +9,7 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "illuminate/support": "^5.1 || ^6.0",
+        "illuminate/support": "^5.1 || ^6.0 || ^7.0 || ^8.0",
         "larva/supports": "^1.2"
     },
     "autoload": {
